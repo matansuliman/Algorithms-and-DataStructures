@@ -11,11 +11,9 @@ class BinarySearchTree:
     """
     insert the key to the BST
     ignores duplicates
-
     time - O(h) where h in the height of the BST
     worst case O(h) = O(n)
     if BST is height balanced then O(h) = O(log n)
-    
     return None
     """
     def insert(self, key:int, type:str="recursive") -> None:
@@ -51,11 +49,9 @@ class BinarySearchTree:
     """
     searchs for node with val in BST
     has recursive and iterative approach
-
     time - O(h) where h in the height of the BST
     worst case O(h) = O(n)
     if BST is height balanced then O(h) = O(log n)
-    
     return TreeNode or None if do not exsist
     """
     def search(self, key:int, type:str="recursive") -> TreeNode:
@@ -80,9 +76,7 @@ class BinarySearchTree:
     """
     traverse the tree values
     has pre/in/post orders approachs
-
     time - O(n) where n in the number of nodes in the BST
-    
     return arr
     """
     def traverse(self, type:str="inorder") -> list[int]:
@@ -139,13 +133,13 @@ class BinarySearchTree:
         return current
     
 
-        """
+    """
     find successor of key in BST
     time - O(h) where h in the height of the BST
     if there is no successor return None
     return successor node
     """
-    def successor(self, key:int):
+    def successor(self, key:int) -> TreeNode:
         node = self.search(key)
         if node == None: return None
 
@@ -170,7 +164,7 @@ class BinarySearchTree:
     if there is no predecessor return None
     return predecessor node
     """
-    def predecessor(self, key):
+    def predecessor(self, key:int) -> TreeNode:
         node = self.search(key)
         if node == None: return None
 
@@ -190,12 +184,14 @@ class BinarySearchTree:
     
 
     """
-    
-    
+    deletes the node with key in BST if exsists
+    time - O(h) where h in the height of the BST
+    updates the root
+    return None
     """
-    def delete(self, key:int, type:str="recursive"):
+    def delete(self, key:int, type:str="recursive") -> None:
 
-        def recursive_delete(root, key):
+        def recursive_delete(root, key:int):
             # base case
             if root == None: return root
             # search in subtrees and update the left or right node
@@ -216,7 +212,7 @@ class BinarySearchTree:
                 root.right = recursive_delete(root.right, root_successor.key)
             return root
         
-        def iterative_delete(root, key):
+        def iterative_delete(root, key:int):
             # find the node and his parent
             node = self.root
             parent = None
@@ -256,12 +252,9 @@ class BinarySearchTree:
 
             return root
 
-
         match type:
-            case "recursive": return recursive_delete(self.root, [])
-            case "iterative": return iterative_delete(self.root, [])
+            case "recursive": self.root = recursive_delete(self.root, key)
+            case "iterative": self.root = iterative_delete(self.root, key)
             case _: return "Invalid type"
-    
-        self.root = recursive_delete(self.root, key)
 
     
