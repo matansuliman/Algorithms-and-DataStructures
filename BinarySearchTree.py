@@ -47,7 +47,6 @@ class BinarySearchTree:
             case "iterative": return iterative_insert(self.root, key)
             case _: return "Invalid type"
 
-    
 
     """
     searchs for node with val in BST
@@ -66,7 +65,7 @@ class BinarySearchTree:
             if key < root.key: return recursive_search(root.left, key)
             else: return recursive_search(root.right, key)
         
-        def iterative_search(node, key: int):
+        def iterative_search(node:TreeNode, key: int):
             while node != None and node.key != key:
                 if key < node.key: node = node.left
                 else: node = node.right
@@ -76,6 +75,7 @@ class BinarySearchTree:
             case "recursive": return recursive_search(self.root, key)
             case "iterative": return iterative_search(self.root, key)
             case _: return "Invalid type"
+
 
     """
     traverse the tree values
@@ -87,28 +87,26 @@ class BinarySearchTree:
     """
     def traverse(self, type:str="inorder") -> list[int]:
 
-        def preorder(self, root:TreeNode, res:list[int]):
+        def preorder(root:TreeNode, res:list[int]):
             if root != None:
                 res.append(root.key)
-                self.preorder(root.left, res)
-                self.preorder(root.right, res)
+                preorder(root.left, res)
+                preorder(root.right, res)
             return res
 
-        def inorder(self, root:TreeNode, res:list[int]):
+        def inorder(root:TreeNode, res:list[int]):
             if root != None:
-                self._inorder(root.left, res)
+                inorder(root.left, res)
                 res.append(root.key)
-                self._inorder(root.right, res)
+                inorder(root.right, res)
             return res
 
-
-        def postorder(self, root:TreeNode, res:list[int]):
+        def postorder(root:TreeNode, res:list[int]):
             if root != None:
-                self.postorder(root.left, res)
-                self.postorder(root.right, res)
+                postorder(root.left, res)
+                postorder(root.right, res)
                 res.append(root.key)
             return res
-
 
         match type:
             case "preorder": return preorder(self.root, [])
@@ -118,56 +116,33 @@ class BinarySearchTree:
     
         return _inorder(self.root, [])
 
-    """
-    find min in BST
-    time - O(h) where h in the height of the BST
-    return min node
-    """
-    def min_value_node(self, node) -> TreeNode:
-        current = node
-        while current.left != None: current = current.left
-        return current
 
     """
     find min in BST
     time - O(h) where h in the height of the BST
     return min node
     """
-    def max_value_node(self, node) -> TreeNode:
+    def min_value_node(self, node:TreeNode) -> TreeNode:
+        current = node
+        while current.left != None: current = current.left
+        return current
+
+
+    """
+    find min in BST
+    time - O(h) where h in the height of the BST
+    return min node
+    """
+    def max_value_node(self, node:TreeNode) -> TreeNode:
         current = node
         while current.right != None: current = current.right
         return current
     
 
-
-    def delete(self, key:int, type:str="recursive"):
-
-        def recursive_delete(self, root, key):
-            if root == None: return root
-            if key < root.key: root.left = recursive_delete(root.left, key)
-            elif key > root.key: root.right = recursive_delete(root.right, key)
-            else:
-                if root.left == None: return root.right
-                elif root.right == None: return root.left\
-                # has both left and right childs
-                temp = self._min_value_node(root.right)
-                root.key = temp.key
-                root.right = recursive_delete(root.right, temp.key)
-            return root
-
-        match type:
-            case "recursive": return recursive_delete(self.root, [])
-            case "iterative": return iterative_delete(self.root, [])
-            case _: return "Invalid type"
-    
-        self.root = recursive_delete(self.root, key)
-
-    
-    
-
-    """
+        """
     find successor of key in BST
     time - O(h) where h in the height of the BST
+    if there is no successor return None
     return successor node
     """
     def successor(self, key:int):
@@ -188,9 +163,11 @@ class BinarySearchTree:
             else: ancestor = ancestor.right
         return successor
 
+
     """
     find predecessor of key in BST
     time - O(h) where h in the height of the BST
+    if there is no predecessor return None
     return predecessor node
     """
     def predecessor(self, key):
@@ -210,3 +187,81 @@ class BinarySearchTree:
                 ancestor = ancestor.right
             else: ancestor = ancestor.left
         return predecessor
+    
+
+    """
+    
+    
+    """
+    def delete(self, key:int, type:str="recursive"):
+
+        def recursive_delete(root, key):
+            # base case
+            if root == None: return root
+            # search in subtrees and update the left or right node
+            if key < root.key: root.left = recursive_delete(root.left, key)
+            elif key > root.key: root.right = recursive_delete(root.right, key)
+            else:
+                # root.key == key => key found
+                # has only right child
+                if root.left == None: return root.right
+                # has only left child
+                elif root.right == None: return root.left
+                # has both left and right childs
+                # find succesor
+                root_successor = self.successor(key)
+                # place succesor instead of root
+                root.key = root_successor.key
+                # delete the succesor in the right subtree
+                root.right = recursive_delete(root.right, root_successor.key)
+            return root
+        
+        def iterative_delete(root, key):
+            # find the node and his parent
+            node = self.root
+            parent = None
+            while node != None and node.key != key:
+                parent = node
+                if key < node.key: node = node.left
+                else: node = node.right
+            # if key not found
+            if node == None: return None
+            # node != None
+            # node has at most 1 child
+            if node.left == None or node.right == None:
+                if node.left != None: new_node = node.left
+                else: new_node = node.right
+                # if the node to be deleted is the root
+                if parent == None: return new_node
+                # check what type of son (left/right) is node
+                # and set the child of the parent to his grandchild
+                if node == parent.left: parent.left = new_node
+                else: parent.right = new_node
+            # node has 2 children
+            else:
+                # find node successor and successor parent
+                parent_successor = None
+                successor = node.right
+                while successor.left != None: 
+                    parent_successor = successor
+                    successor = successor.left
+                # note: there is no left child to successor
+                # if the successor is the right child of node
+                # (equal to parent of successor to be None beacuse of the while loop above)
+                if parent_successor == None: node.right = successor.right
+                # if not, replace successor with his right child
+                else: parent_successor.left = successor.right
+                # replace the node with his successor
+                node.key = successor.key
+
+            return root
+
+
+        match type:
+            case "recursive": return recursive_delete(self.root, [])
+            case "iterative": return iterative_delete(self.root, [])
+            case _: return "Invalid type"
+    
+        self.root = recursive_delete(self.root, key)
+
+    
